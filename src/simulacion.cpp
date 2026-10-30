@@ -34,11 +34,12 @@ struct Propuesta {
     bool reproduce;
 };
 
-// Se compara la edad antes de reiniciarla por reproduccion y el hambre antes
+// Se compara la edad despues de reiniciarla por reproduccion y el hambre antes
 // de comer. El PDF no fija el empate total: se elige el menor origen (fila,col).
 bool preferir(const Propuesta& a, const Propuesta& b) {
-    if (a.animal.edadReproduccion != b.animal.edadReproduccion)
-        return a.animal.edadReproduccion > b.animal.edadReproduccion;
+    const int edadA = a.reproduce ? 0 : a.animal.edadReproduccion;
+    const int edadB = b.reproduce ? 0 : b.animal.edadReproduccion;
+    if (edadA != edadB) return edadA > edadB;
     if (a.animal.tipo == Tipo::FOX && a.animal.hambre != b.animal.hambre)
         return a.animal.hambre < b.animal.hambre;
     return std::tie(a.origen.fila, a.origen.columna)
@@ -102,7 +103,7 @@ void moverEspecie(Mundo& mundo, Tipo especie) {
     mundo.matriz = std::move(siguiente);
 }
 
-}  // namespace
+}  
 
 void moverConejos(Mundo& mundo) { moverEspecie(mundo, Tipo::RABBIT); }
 void moverZorros(Mundo& mundo) { moverEspecie(mundo, Tipo::FOX); }

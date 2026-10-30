@@ -113,8 +113,35 @@ int main() {
         conejos.matriz[0][2].edadReproduccion = 2;
         moverConejos(conejos);
         exigir(contarPoblacion(conejos).conejos == 2
-               && conejos.matriz[0][1].edadReproduccion == 0,
-               "Prioridad usa edad anterior al reinicio por nacimiento");
+               && conejos.matriz[0][1].edadReproduccion == 3,
+               "Prioridad usa edad posterior al reinicio por nacimiento");
+
+        // Regresion: edades iniciales 3 y 1, intervalo 3. Tras el paso
+        // compiten con edades 0 y 2, no con las edades anteriores al nacimiento.
+        // Repetir ambos ordenes evita que gane siempre el primero recorrido.
+        for (Tipo especie : {Tipo::RABBIT, Tipo::FOX}) {
+            for (int mayor : {0, 2}) {
+                auto caso = leer("3 3 9 1 1 3 0\n");
+                caso.matriz[0][mayor] = Celda{especie, 3, 0};
+                caso.matriz[0][2 - mayor] = Celda{especie, 1, 0};
+                if (especie == Tipo::RABBIT) moverConejos(caso);
+                else moverZorros(caso);
+                exigir(caso.matriz[0][1].tipo == especie
+                       && caso.matriz[0][1].edadReproduccion == 2
+                       && caso.matriz[0][mayor].tipo == especie
+                       && caso.matriz[0][mayor].edadReproduccion == 0
+                       && caso.matriz[0][2 - mayor].tipo == Tipo::EMPTY,
+                       "Gana edad 2 frente a 0; sobrevive la cria del adulto perdedor");
+            }
+        }
+        auto ambos = leer("9 3 9 1 1 3 2\nFOX 0 0\nFOX 0 2\n");
+        ambos.matriz[0][0] = Celda{Tipo::FOX, 5, 4};
+        ambos.matriz[0][2] = Celda{Tipo::FOX, 3, 1};
+        moverZorros(ambos);
+        exigir(contarPoblacion(ambos).zorros == 3
+               && ambos.matriz[0][1].edadReproduccion == 0
+               && ambos.matriz[0][1].hambre == 2,
+               "Si ambos se reproducen empatan en edad cero y gana el menos hambriento");
 
         auto simultaneo = leer("9 9 9 1 1 4 2\nFOX 0 1\nFOX 0 2\n");
         moverZorros(simultaneo);
