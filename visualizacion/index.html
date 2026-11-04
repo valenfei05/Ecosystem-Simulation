@@ -144,7 +144,9 @@ function chart(){const cv=$('chart'),w=Math.max(260,cv.parentElement.clientWidth
 $('play').onclick=()=>{if(playing)pause();else{if(G>=P.ngen)$('reset').click();playing=true;ui();loop()}};
 $('step').onclick=()=>{pause();step()};
 $('reset').onclick=()=>{frames?load({...frames[0].p,ngen:frames.length-1},build(frames[0].p,frames[0].o)):load(P,W0)};
-$('rand').onclick=randomWorld;$('spd').oninput=e=>$('fps').textContent=e.target.value;
+// Cada clic usa una semilla nueva para crear un mundo diferente.
+$('rand').onclick=()=>{ $('seed').value=(Number($('seed').value)||0)+1; randomWorld(); };
+$('spd').oninput=e=>$('fps').textContent=e.target.value;
 $('fin').onchange=async e=>{const a=parseAll(await e.target.files[0].text())[0];frames=null;load(a.p,build(a.p,a.o))};
 $('ftr').onchange=async e=>{const a=parseAll(await e.target.files[0].text());frames=a;P={...a[0].p,ngen:a.length-1};load(P,build(a[0].p,a[0].o))};
 $('csv').onclick=()=>{const s='generacion,conejos,zorros,rocas\n'+hist.map((a,i)=>[i,...a].join(',')).join('\n'),
